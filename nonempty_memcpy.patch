@@ -1,0 +1,24 @@
+From e6f21c565cbba7bb591d9a5c2c780cb56556e63e Mon Sep 17 00:00:00 2001
+From: Yee <yee.chow@citizensadvice.org.uk>
+Date: Wed, 31 Mar 2021 14:52:53 +0700
+Subject: [PATCH] Patch ruby_nonempty_memcpy
+
+---
+ include/ruby/internal/memory.h | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/include/ruby/internal/memory.h b/include/ruby/internal/memory.h
+index 974c21e..e66ce87 100644
+--- a/include/ruby/internal/memory.h
++++ b/include/ruby/internal/memory.h
+@@ -271,8 +271,6 @@ ruby_nonempty_memcpy(void *dest, const void *src, size_t n)
+         return dest;
+     }
+ }
+-#undef memcpy
+-#define memcpy ruby_nonempty_memcpy
+ #endif
+
+ #endif /* RBIMPL_MEMORY_H */
+--
+2.24.3 (Apple Git-128)
