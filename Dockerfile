@@ -20,7 +20,7 @@ ENV RUBY_MAJOR 3.0
 ENV RUBY_VERSION 3.0.0
 ENV RUBY_DOWNLOAD_SHA256 68bfaeef027b6ccd0032504a68ae69721a70e97d921ff328c0c8836c798f6cb1
 
-COPY nonempty_memcpy.patch /usr/
+COPY ruby-ruby_nonempty_memcpy-musl-cxx.patch /usr/
 # some of ruby's build scripts are written in ruby
 #   we purge system ruby later to make sure our final image uses what we just built
 # readline-dev vs libedit-dev: https://bugs.ruby-lang.org/issues/11869 and https://github.com/docker-library/ruby/issues/75
@@ -74,8 +74,8 @@ RUN set -eux; \
 	rm thread-stack-fix.patch; \
 	\
 # custom fix for memory.h ruby_nonempty_memcpy
-   patch -p1 -i /usr/nonempty_memcpy.patch; \
-   rm /usr/nonempty_memcpy.patch; \
+   patch -p1 -i /usr/ruby-ruby_nonempty_memcpy-musl-cxx.patch; \
+   rm /usr/ruby-ruby_nonempty_memcpy-musl-cxx.patch; \
 # hack in "ENABLE_PATH_CHECK" disabling to suppress:
 #   warning: Insecure world writable dir
 	{ \
