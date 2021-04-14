@@ -17,8 +17,8 @@ RUN set -eux; \
 
 ENV LANG C.UTF-8
 ENV RUBY_MAJOR 3.0
-ENV RUBY_VERSION 3.0.0
-ENV RUBY_DOWNLOAD_SHA256 68bfaeef027b6ccd0032504a68ae69721a70e97d921ff328c0c8836c798f6cb1
+ENV RUBY_VERSION 3.0.1
+ENV RUBY_DOWNLOAD_SHA256 d06bccd382d03724b69f674bc46cd6957ba08ed07522694ce44b9e8ffc9c48e2
 
 COPY ruby-ruby_nonempty_memcpy-musl-cxx.patch /usr/
 # some of ruby's build scripts are written in ruby
