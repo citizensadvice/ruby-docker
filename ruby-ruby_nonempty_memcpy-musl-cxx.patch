@@ -1,0 +1,18 @@
+--- a/include/ruby/internal/memory.h
++++ b/include/ruby/internal/memory.h
+@@ -256,6 +256,7 @@
+ }
+ 
+ #ifndef __MINGW32__
++RBIMPL_SYMBOL_EXPORT_BEGIN()
+ RBIMPL_ATTR_NOALIAS()
+ RBIMPL_ATTR_NONNULL((1))
+ RBIMPL_ATTR_RETURNS_NONNULL()
+@@ -272,6 +273,7 @@
+         return dest;
+     }
+ }
++RBIMPL_SYMBOL_EXPORT_END()
+ #undef memcpy
+ #define memcpy ruby_nonempty_memcpy
+ #endif
