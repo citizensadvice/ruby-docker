@@ -2,7 +2,7 @@
 # This is a copy of the official docker ruby build
 # https://github.com/docker-library/ruby/blob/master/3.0/alpine3.12/Dockerfile
 ############################################################
-FROM alpine:3.12
+FROM alpine:3.13
 
 RUN apk add --no-cache \
 		gmp-dev
