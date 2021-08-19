@@ -1,11 +1,19 @@
 ############################################################
 # This is a copy of the official docker ruby build
-# https://github.com/docker-library/ruby/blob/master/3.0/alpine3.12/Dockerfile
+# https://github.com/docker-library/ruby/blob/master/3.0/alpine3.13/Dockerfile
 ############################################################
 FROM alpine:3.13
 
-RUN apk add --no-cache \
-		gmp-dev
+RUN set -eux; \
+	apk add --no-cache \
+		bzip2 \
+		ca-certificates \
+		gmp-dev \
+		libffi-dev \
+		procps \
+		yaml-dev \
+		zlib-dev \
+	;
 
 # skip installing gem documentation
 RUN set -eux; \
@@ -17,15 +25,15 @@ RUN set -eux; \
 
 ENV LANG C.UTF-8
 ENV RUBY_MAJOR 3.0
-ENV RUBY_VERSION 3.0.1
-ENV RUBY_DOWNLOAD_SHA256 d06bccd382d03724b69f674bc46cd6957ba08ed07522694ce44b9e8ffc9c48e2
+ENV RUBY_VERSION 3.0.2
+ENV RUBY_DOWNLOAD_SHA256 570e7773100f625599575f363831166d91d49a1ab97d3ab6495af44774155c40
 
 COPY ruby-ruby_nonempty_memcpy-musl-cxx.patch /usr/
 # some of ruby's build scripts are written in ruby
 #   we purge system ruby later to make sure our final image uses what we just built
-# readline-dev vs libedit-dev: https://bugs.ruby-lang.org/issues/11869 and https://github.com/docker-library/ruby/issues/75
 RUN set -eux; \
 	\
+# readline-dev vs libedit-dev: https://bugs.ruby-lang.org/issues/11869 and https://github.com/docker-library/ruby/issues/75
 	apk add --no-cache --virtual .ruby-builddeps \
 		autoconf \
 		bison \
@@ -34,6 +42,7 @@ RUN set -eux; \
 		ca-certificates \
 		coreutils \
 		dpkg-dev dpkg \
+		g++ \
 		gcc \
 		gdbm-dev \
 		glib-dev \
@@ -76,6 +85,9 @@ RUN set -eux; \
 # custom fix for memory.h ruby_nonempty_memcpy
    patch -p1 -i /usr/ruby-ruby_nonempty_memcpy-musl-cxx.patch; \
    rm /usr/ruby-ruby_nonempty_memcpy-musl-cxx.patch; \
+# the configure script does not detect isnan/isinf as macros
+	export ac_cv_func_isnan=yes ac_cv_func_isinf=yes; \
+	\
 # hack in "ENABLE_PATH_CHECK" disabling to suppress:
 #   warning: Insecure world writable dir
 	{ \
@@ -87,8 +99,6 @@ RUN set -eux; \
 	\
 	autoconf; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
-# the configure script does not detect isnan/isinf as macros
-	export ac_cv_func_isnan=yes ac_cv_func_isinf=yes; \
 	./configure \
 		--build="$gnuArch" \
 		--disable-install-doc \
@@ -103,24 +113,19 @@ RUN set -eux; \
 			| sort -u \
 			| awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)"; \
-	apk add --no-network --virtual .ruby-rundeps \
-		$runDeps \
-		bzip2 \
-		ca-certificates \
-		libffi-dev \
-		procps \
-		yaml-dev \
-		zlib-dev \
-	; \
+	apk add --no-network --virtual .ruby-rundeps $runDeps; \
 	apk del --no-network .ruby-builddeps; \
 	\
 	cd /; \
 	rm -r /usr/src/ruby; \
 # verify we have no "ruby" packages installed
-	! apk --no-network list --installed \
-		| grep -v '^[.]ruby-rundeps' \
-		| grep -i ruby \
-	; \
+	if \
+		apk --no-network list --installed \
+			| grep -v '^[.]ruby-rundeps' \
+			| grep -i ruby \
+	; then \
+		exit 1; \
+	fi; \
 	[ "$(command -v ruby)" = '/usr/local/bin/ruby' ]; \
 # rough smoke test
 	ruby --version; \
