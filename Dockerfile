@@ -1,6 +1,6 @@
 ############################################################
 # This is a copy of the official docker ruby build
-# https://github.com/docker-library/ruby/blob/master/3.0/alpine3.14/Dockerfile
+# https://github.com/docker-library/ruby/blob/master/3.0/alpine3.13/Dockerfile
 ############################################################
 FROM alpine:3.13
 
